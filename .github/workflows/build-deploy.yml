@@ -6,7 +6,7 @@ env:
   DATABASE_HOSTNAME: localhost1
 
 jobs: 
-  job1:
+  build:
     environment:
       name: testing
     env:
@@ -52,8 +52,18 @@ jobs:
           pip install pytest
           pytest -v -s
 
+
+  deploy:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: deploying stuff
+        run: echo "going to deploy some stuff"
+       
   job2:
     runs-on: ubuntu-latest
+    environment:
+      name: testing
     steps:
       - name: test env
         run: |
