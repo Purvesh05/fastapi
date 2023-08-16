@@ -55,5 +55,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: test env
-        run: echo "$DATABASE_HOSTNAME"
+        run: echo "$DATABASE_PORT"
   
