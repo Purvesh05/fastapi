@@ -74,21 +74,6 @@ jobs:
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
        
-  job2:
-    runs-on: ubuntu-latest
-    environment:
-      name: testing
-    steps:
-      - name: test env
-        run: |
-          echo " ${{ secrets.DATABASE_PORT }} "
-          echo " ${{ secrets.DATABASE_HOSTNAME }} " 
-          echo " ${{ secrets.DATABASE_PORT }} "
-          echo " ${{ secrets.DATABASE_PASSWORD }} "
-          echo " ${{ secrets.DATABASE_NAME }} "
-          echo " ${{ secrets.DATABASE_USERNAME }} "
-          echo " ${{ secrets.SECRET_KEY }} "
-          echo " ${{ secrets.ALGORITHM }} "
-          echo " ${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }} "
+
 
   
