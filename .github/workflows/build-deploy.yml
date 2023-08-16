@@ -1,49 +1,65 @@
-name: PostgreSQL Service Example
-on: push
+name: Build and Deploy Code
 
-jobs:
-  # Label of the runner job
-  runner-job:
-    # You must use a Linux environment when using service containers or container jobs
-    runs-on: ubuntu-latest
+on: [push, pull_request]
 
-    # Service containers to run with `runner-job`
+env:
+  DATABASE_HOSTNAME: localhost1
+
+jobs: 
+  job1:
+    env:
+      DATABASE_HOSTNAME: localhost
+      DATABASE_PORT: 5432
+      DATABASE_PASSWORD: root123
+      DATABASE_NAME: fastapi_test
+      DATABASE_USERNAME: postgres
+      SECRET_KEY: 09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7
+      ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 60
     services:
-      # Label used to access the service container
       postgres:
-        # Docker Hub image
         image: postgres
-        # Provide the password for postgres
         env:
-          POSTGRES_PASSWORD: postgres
-        # Set health checks to wait until postgres has started
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          # Maps tcp port 5432 on service container to the host
-          - 5432:5432
+          POSTGRES_PASSWORD: root123
+          POSTGRES_DB: fastapi_test
+          options: >-
+            --health-cmd pg_isready
+            --health-inteval 10s
+            --health-retries 5
+            --health-timeout 5s
 
+    runs-on: ubuntu-latest
     steps:
-      # Downloads a copy of the code in your repository before running CI tests
-      - name: Check out repository code
-        uses: actions/checkout@v3
+      - name: pulling git repo
+        uses: actions/checkout@v2 
+      - name: Install python version 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.9"
+      - name: update
+        run: python -m pip install --upgrade pip
+      - name: install all dependencies
+        run: pip install -r requirements.txt
+      - name: test env
+        run: echo "$DATABASE_HOSTNAME"  
+      - name: test with pytest
+        run: |
+          pip install pytest
+          pytest -v -s
 
-      # Performs a clean installation of all dependencies in the `package.json` file
-      # For more information, see https://docs.npmjs.com/cli/ci.html
-      - name: Install dependencies
-        run: npm ci
+  job2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: test env
+        run: |
+          echo " ${{ secrets.DATABASE_PORT }} "
+          echo " ${{ secrets.DATABASE_HOSTNAME }} " 
+          echo " ${{ secrets.DATABASE_PORT }} "
+          echo " ${{ secrets.DATABASE_PASSWORD }} "
+          echo " ${{ secrets.DATABASE_NAME }} "
+          echo " ${{ secrets.DATABASE_USERNAME }} "
+          echo " ${{ secrets.SECRET_KEY }} "
+          echo " ${{ secrets.ALGORITHM }} "
+          echo " ${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }} "
 
-      - name: Connect to PostgreSQL
-        # Runs a script that creates a PostgreSQL table, populates
-        # the table with data, and then retrieves the data
-        run: node client.js
-        # Environment variables used by the `client.js` script to create
-        # a new PostgreSQL table.
-        env:
-          # The hostname used to communicate with the PostgreSQL service container
-          POSTGRES_HOST: localhost
-          # The default PostgreSQL port
-          POSTGRES_PORT: 5432
+  
