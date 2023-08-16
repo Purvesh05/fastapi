@@ -30,12 +30,11 @@ jobs:
       - name: install all dependencies
         run: pip install -r requirements.txt
       - name: test env
-        run: echo "$DATABASE_HOSTNAME"
-  
-      # - name: test with pytest
-      #   run: |
-      #     pip install pytest
-      #     pytest -v -s
+        run: echo "$DATABASE_HOSTNAME"  
+      - name: test with pytest
+        run: |
+          pip install pytest
+          pytest -v -s
 
   job2:
     runs-on: ubuntu-latest
