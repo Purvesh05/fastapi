@@ -55,6 +55,8 @@ jobs:
   deploy:
     
     runs-on: ubuntu-latest
+    environment:
+      name: testing
     steps:
       - name: Use Node 16
         uses: actions/setup-node@v1
