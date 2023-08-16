@@ -1,67 +1,47 @@
-name: Build and Deploy Code
+name: PostgreSQL service example
+on: push
 
-on: [push, pull_request]
+jobs:
+  # Label of the container job
+  container-job:
+    # Containers must run in Linux based operating systems
+    runs-on: ubuntu-latest
+    # Docker Hub image that `container-job` executes in
+    container: node:10.18-jessie
 
-env:
-  DATABASE_HOSTNAME: localhost1
-
-jobs: 
-  job1:
-    env:
-      DATABASE_HOSTNAME: ${{ secrets.DATABASE_HOSTNAME }}
-      DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
-      DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-      DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
-      DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
-      SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      ALGORITHM: ${{ secrets.ALGORITHM }}
-      ACCESS_TOKEN_EXPIRE_MINUTES: ${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}
-
+    # Service containers to run with `container-job`
     services:
+      # Label used to access the service container
       postgres:
+        # Docker Hub image
         image: postgres
+        # Provide the password for postgres
         env:
-          POSTGRES_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-          POSTGRES_DB: ${{ secrets.DATABASE_NAME }}_test
+          POSTGRES_PASSWORD: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
-          options: >-
-            --health-cmd pg_isready
-            --health-inteval 10s
-            --health-retries 5
-            --health-timeout 5s
-
-    runs-on: ubuntu-latest
     steps:
-      - name: pulling git repo
-        uses: actions/checkout@v2 
-      - name: Install python version 3.9
-        uses: actions/setup-python@v2
-        with:
-          python-version: "3.9"
-      - name: update
-        run: python -m pip install --upgrade pip
-      - name: install all dependencies
-        run: pip install -r requirements.txt
-      - name: test env
-        run: echo "$DATABASE_HOSTNAME"  
-      - name: test with pytest
-        run: |
-          pip install pytest
-          pytest -v -s
+      # Downloads a copy of the code in your repository before running CI tests
+      - name: Check out repository code
+        uses: actions/checkout@v3
 
-  job2:
-    runs-on: ubuntu-latest
-    steps:
-      - name: test env
-        run: |
-          echo " ${{ secrets.DATABASE_PORT }} "
-          echo " ${{ secrets.DATABASE_HOSTNAME }} " 
-          echo " ${{ secrets.DATABASE_PORT }} "
-          echo " ${{ secrets.DATABASE_PASSWORD }} "
-          echo " ${{ secrets.DATABASE_NAME }} "
-          echo " ${{ secrets.DATABASE_USERNAME }} "
-          echo " ${{ secrets.SECRET_KEY }} "
-          echo " ${{ secrets.ALGORITHM }} "
-          echo " ${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }} "
+      # Performs a clean installation of all dependencies in the `package.json` file
+      # For more information, see https://docs.npmjs.com/cli/ci.html
+      - name: Install dependencies
+        run: npm ci
 
-  
+      - name: Connect to PostgreSQL
+        # Runs a script that creates a PostgreSQL table, populates
+        # the table with data, and then retrieves the data.
+        run: node client.js
+        # Environment variables used by the `client.js` script to create a new PostgreSQL table.
+        env:
+          # The hostname used to communicate with the PostgreSQL service container
+          POSTGRES_HOST: postgres
+          # The default PostgreSQL port
+          POSTGRES_PORT: 5432
