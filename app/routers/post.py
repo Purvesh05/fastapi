@@ -23,9 +23,9 @@ def post(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_c
                     models.Post.id == models.Vote.post_id,isouter=True).\
                     group_by(models.Post.id).filter(models.Post.title.contains(search)).\
                     limit(limit).offset(skip)
-    print(result_query)
+    # print(result_query)
     result = result_query.all()
-    print(result)
+    # print(result)
     return result
    
 
@@ -41,7 +41,7 @@ def create_posts(post: schemas.PostBase, db: Session = Depends(get_db), current_
     # new_post = cursor.fetchone()
     # conn.commit()
 
-    print("current_user: ",current_user.id )
+    # print("current_user: ",current_user.id )
     if post is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
  
