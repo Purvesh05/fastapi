@@ -15,4 +15,4 @@ jobs:
       - name: update
         run: python -m pip install --upgrade pip
       - name: install all dependencies
-        run: pip intall -r requirements.txt
+        run: pip install -r requirements.txt
