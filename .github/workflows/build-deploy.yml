@@ -52,13 +52,14 @@ jobs:
           pip install pytest
           pytest -v -s
 
-
   deploy:
-    needs: [build]
+    
     runs-on: ubuntu-latest
     steps:
-      - name: deploying stuff
-        run: echo "going to deploy some stuff"
+      - name: Deploy
+        run: railway up
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
        
   job2:
     runs-on: ubuntu-latest
