@@ -56,6 +56,17 @@ jobs:
     
     runs-on: ubuntu-latest
     steps:
+      - name: Use Node 12
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+          
+      - name: Install packages
+        run: yarn install --frozen-lockfile
+
+      - name: Install Railway
+        run: npm i -g @railway/cli
+
       - name: Deploy
         run: railway up
         env:
