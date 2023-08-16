@@ -20,8 +20,10 @@ jobs:
       postgres:
         image: postgres
         env:
+          POSTGRES_HOST: localhost
           POSTGRES_PASSWORD: root123
           POSTGRES_DB: fastapi_test
+          POSTGRES_PORT: 5432
           options: >-
             --health-cmd pg_isready
             --health-inteval 10s
